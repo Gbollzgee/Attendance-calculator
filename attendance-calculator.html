@@ -399,6 +399,142 @@
     98% { clip-path: none; transform: translate(0); }
   }
 
+  /* --- HINTS PANEL --- */
+  .hints-panel {
+    margin-bottom: 20px;
+  }
+  .hints-header {
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; padding: 20px 28px;
+    border-radius: 20px 20px 0 0;
+    background: var(--glass); backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-bottom: none;
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .hints-panel.collapsed .hints-header {
+    border-radius: 20px; border-bottom: 1px solid var(--glass-border);
+  }
+  .hints-header:hover { background: rgba(0,100,180,0.18); }
+  .hints-header-left { display: flex; align-items: center; gap: 10px; }
+  .hints-toggle-icon { font-size: 12px; color: var(--neon-blue); transition: transform 0.3s ease; }
+  .hints-panel.collapsed .hints-toggle-icon { transform: rotate(-90deg); }
+
+  .hints-body {
+    background: var(--glass); backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); border-top: none;
+    border-radius: 0 0 20px 20px; padding: 0 24px 24px;
+    overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease, padding 0.35s ease;
+    max-height: 900px; opacity: 1;
+  }
+  .hints-panel.collapsed .hints-body {
+    max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0;
+  }
+
+  .hints-divider {
+    height: 1px; background: linear-gradient(90deg, transparent, rgba(0,180,255,0.25), transparent);
+    margin-bottom: 20px;
+  }
+
+  .hint-intro {
+    font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 20px;
+    padding: 12px 16px; background: rgba(0,180,255,0.04); border-radius: 10px;
+    border-left: 3px solid rgba(0,180,255,0.3);
+  }
+
+  .hint-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 650px) { .hint-cards { grid-template-columns: 1fr; } }
+
+  .hint-card {
+    border-radius: 16px; border: 1px solid; padding: 18px 20px;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .hint-card:hover { transform: translateY(-2px); }
+
+  .hint-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, currentColor 0%, transparent 50%);
+    opacity: 0.04; pointer-events: none;
+  }
+
+  .hint-card.hc-yellow { border-color: rgba(247,255,0,0.25); background: rgba(247,255,0,0.04); }
+  .hint-card.hc-yellow:hover { box-shadow: 0 8px 32px rgba(247,255,0,0.1); }
+  .hint-card.hc-green { border-color: rgba(0,255,136,0.25); background: rgba(0,255,136,0.04); }
+  .hint-card.hc-green:hover { box-shadow: 0 8px 32px rgba(0,255,136,0.1); }
+  .hint-card.hc-cyan { border-color: rgba(0,180,255,0.25); background: rgba(0,180,255,0.04); }
+  .hint-card.hc-cyan:hover { box-shadow: 0 8px 32px rgba(0,180,255,0.1); }
+  .hint-card.hc-purple { border-color: rgba(180,79,255,0.35); background: rgba(180,79,255,0.06); }
+  .hint-card.hc-purple:hover { box-shadow: 0 8px 32px rgba(180,79,255,0.15); }
+
+  .hint-card-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+  .hint-card-label {
+    font-family: 'Orbitron', monospace; font-size: 9px; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 6px; opacity: 0.6;
+  }
+  .hc-yellow .hint-card-label { color: var(--free-rehab); }
+  .hc-green .hint-card-label { color: var(--qualified); }
+  .hc-cyan .hint-card-label { color: var(--neon-blue); }
+  .hc-purple .hint-card-label { color: var(--neon-purple); }
+
+  .hint-card-scenario { font-size: 13px; color: var(--text-primary); font-weight: 500; margin-bottom: 12px; line-height: 1.5; }
+
+  .hint-stat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .hint-pts {
+    font-family: 'Orbitron', monospace; font-size: 18px; font-weight: 700;
+  }
+  .hc-yellow .hint-pts { color: var(--free-rehab); }
+  .hc-green .hint-pts { color: var(--qualified); }
+  .hc-cyan .hint-pts { color: var(--neon-blue); }
+  .hc-purple .hint-pts { color: var(--neon-purple); }
+
+  .hint-pts-label { font-size: 11px; color: var(--text-muted); }
+
+  .hint-pct-bar { height: 5px; border-radius: 100px; background: rgba(255,255,255,0.07); margin-bottom: 10px; overflow: hidden; }
+  .hint-pct-fill { height: 100%; border-radius: 100px; transition: width 0.6s ease; }
+  .hc-yellow .hint-pct-fill { background: var(--free-rehab); box-shadow: 0 0 8px rgba(247,255,0,0.5); }
+  .hc-green .hint-pct-fill { background: var(--qualified); box-shadow: 0 0 8px rgba(0,255,136,0.5); }
+  .hc-cyan .hint-pct-fill { background: var(--neon-blue); box-shadow: 0 0 8px rgba(0,180,255,0.5); }
+  .hc-purple .hint-pct-fill { background: var(--neon-purple); box-shadow: 0 0 8px rgba(180,79,255,0.5); }
+
+  .hint-verdict {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.5px; border: 1px solid;
+  }
+  .hint-verdict.v-qualified { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.4); color: var(--qualified); }
+  .hint-verdict.v-free { background: rgba(247,255,0,0.1); border-color: rgba(247,255,0,0.4); color: var(--free-rehab); }
+
+  .hint-special-card {
+    grid-column: 1 / -1;
+    border-radius: 16px; padding: 20px 24px;
+    background: linear-gradient(135deg, rgba(180,79,255,0.08), rgba(0,180,255,0.06));
+    border: 1px solid rgba(180,79,255,0.35);
+    display: flex; align-items: center; gap: 20px;
+    position: relative; overflow: hidden;
+  }
+  .hint-special-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(180,79,255,0.06), transparent, rgba(0,180,255,0.06));
+    animation: shimmer 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes shimmer { 0%,100%{opacity:0.5} 50%{opacity:1} }
+  .special-emoji { font-size: 40px; flex-shrink: 0; filter: drop-shadow(0 0 12px rgba(180,79,255,0.5)); animation: floatEmoji 3s ease-in-out infinite; }
+  @keyframes floatEmoji { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+  .special-text-block { flex: 1; }
+  .special-title { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; color: var(--neon-purple); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .special-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+  .special-desc strong { color: var(--text-primary); }
+  .special-pts {
+    flex-shrink: 0; text-align: center;
+    background: rgba(180,79,255,0.12); border: 1px solid rgba(180,79,255,0.3);
+    border-radius: 12px; padding: 12px 18px;
+  }
+  .special-pts-num { font-family: 'Orbitron', monospace; font-size: 26px; font-weight: 900; color: var(--neon-purple); display: block; line-height: 1; }
+  .special-pts-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; margin-top: 4px; display: block; }
+
   /* mobile tweaks */
   @media (max-width: 480px) {
     .app-wrapper { padding: 12px 12px 48px; }
@@ -424,15 +560,162 @@
 
   <!-- HEADER -->
   <header>
-    <div class="header-badge">⬡ Semester Tracker ⬡</div>
+    <div class="header-badge">⬡ JABU Semester Tracker ⬡</div>
     <h1>Attendance &amp; Rehabilitation<br>Eligibility Calculator</h1>
-    <p class="header-sub">Feb 28 — Jun 29, 2026 &nbsp;·&nbsp; Automated Eligibility Assessment</p>
+    <p class="header-sub">JABU &nbsp;·&nbsp; Feb 28 — Jun 29, 2026 &nbsp;·&nbsp; Automated Eligibility Assessment</p>
     <div class="semester-info">
       <span>Total Points: <strong>156</strong></span>
       <span>Semester: <strong>2026</strong></span>
       <span>Threshold: <strong>&gt;70%</strong></span>
     </div>
   </header>
+
+  <!-- HINTS PANEL -->
+  <div class="hints-panel" id="hints-panel">
+    <div class="hints-header" onclick="toggleHints()">
+      <div class="hints-header-left">
+        <div class="card-icon" style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(180,79,255,0.12);border:1px solid rgba(180,79,255,0.3);">💡</div>
+        <div>
+          <div class="card-title" style="font-family:'Orbitron',monospace;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">Attendance Scenarios — Know Your Standing</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Tap to see what different attendance patterns actually mean</div>
+        </div>
+      </div>
+      <div class="hints-toggle-icon">▼</div>
+    </div>
+    <div class="hints-body">
+      <div class="hints-divider"></div>
+      <div class="hint-intro">
+        The semester runs <strong style="color:var(--neon-blue)">Feb 28 – Jun 29, 2026</strong> with <strong style="color:var(--neon-blue)">156 total points</strong> available. 
+        Here's exactly what you'd score under each real-world attendance pattern — so you know where you stand before it's too late.
+      </div>
+      <div class="hint-cards">
+
+        <!-- Scenario A: Morning Devotion Only, No Sunday -->
+        <div class="hint-card hc-yellow">
+          <span class="hint-card-icon">🕐</span>
+          <div class="hint-card-label">Scenario A</div>
+          <div class="hint-card-scenario">
+            You attend <strong>Morning Devotion only</strong> every weekday — no Bible Study, no Community Service, no Tarry Night, and no Sunday Service. Not a single skip.
+          </div>
+          <div class="hint-stat-row">
+            <span class="hint-pts">86 pts</span>
+            <span class="hint-pts-label">out of 156</span>
+          </div>
+          <div class="hint-pct-bar"><div class="hint-pct-fill" style="width:55.13%"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+            <span class="hint-verdict v-free">⚡ Free Rehab Required</span>
+            <span style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--free-rehab)">55.13%</span>
+          </div>
+        </div>
+
+        <!-- Scenario B: Morning Devotion Only + Sunday -->
+        <div class="hint-card hc-cyan">
+          <span class="hint-card-icon">🕐☀️</span>
+          <div class="hint-card-label">Scenario B</div>
+          <div class="hint-card-scenario">
+            You attend <strong>Morning Devotion every weekday + Sunday Service</strong> consistently — still skipping Bible Study, Community Service &amp; Tarry Night.
+          </div>
+          <div class="hint-stat-row">
+            <span class="hint-pts">104 pts</span>
+            <span class="hint-pts-label">out of 156</span>
+          </div>
+          <div class="hint-pct-bar"><div class="hint-pct-fill" style="width:66.67%"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+            <span class="hint-verdict v-free">⚡ Free Rehab Required</span>
+            <span style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--neon-blue)">66.67%</span>
+          </div>
+        </div>
+
+        <!-- Scenario C: All Church Sessions WITHOUT Sunday -->
+        <div class="hint-card hc-green">
+          <span class="hint-card-icon">⛪</span>
+          <div class="hint-card-label">Scenario C</div>
+          <div class="hint-card-scenario">
+            You attend <strong>all weekday sessions fully</strong> — Morning Devotion, Bible Study, Community Service &amp; Tarry Night — but <em>skip every Sunday Service</em>.
+          </div>
+          <div class="hint-stat-row">
+            <span class="hint-pts">138 pts</span>
+            <span class="hint-pts-label">out of 156</span>
+          </div>
+          <div class="hint-pct-bar"><div class="hint-pct-fill" style="width:88.46%"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+            <span class="hint-verdict v-qualified">✦ Qualified — No Rehab</span>
+            <span style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--qualified)">88.46%</span>
+          </div>
+        </div>
+
+        <!-- Scenario D: All Church Sessions WITH Sunday -->
+        <div class="hint-card hc-green">
+          <span class="hint-card-icon">⛪☀️</span>
+          <div class="hint-card-label">Scenario D</div>
+          <div class="hint-card-scenario">
+            You attend <strong>all weekday sessions fully</strong> AND never miss <strong>Sunday Service</strong>. Maximum possible attendance — zero absences all semester.
+          </div>
+          <div class="hint-stat-row">
+            <span class="hint-pts">156 pts</span>
+            <span class="hint-pts-label">out of 156</span>
+          </div>
+          <div class="hint-pct-bar"><div class="hint-pct-fill" style="width:100%"></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+            <span class="hint-verdict v-qualified">✦ Qualified — No Rehab</span>
+            <span style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--qualified)">100%</span>
+          </div>
+        </div>
+
+        <!-- Special Card: Do both actively -->
+        <div class="hint-special-card">
+          <div class="special-emoji">🏆</div>
+          <div class="special-text-block">
+            <div class="special-title">If You Do BOTH Actively — All Sessions + All Sundays</div>
+            <div class="special-desc">
+              You show up to <strong>every Morning Devotion, Bible Study, Community Service, Tarry Night, and Sunday Service</strong> — zero skips all semester long.
+              You don't just qualify, you hit the <strong>absolute ceiling</strong>. That's not just dedication — that's a statement. 
+              <span style="color:var(--neon-purple);font-weight:600">Good luck. You won't need it.</span> 🎯
+            </div>
+          </div>
+          <div class="special-pts">
+            <span class="special-pts-num">100%</span>
+            <span class="special-pts-label">156 / 156 pts</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Summary comparison mini-table -->
+      <div style="margin-top:20px;padding:16px 18px;background:rgba(0,10,30,0.5);border-radius:12px;border:1px solid rgba(0,180,255,0.1);">
+        <div style="font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:14px;">Quick Reference Summary</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:8px;font-size:11px;color:var(--text-muted);font-family:'Orbitron',monospace;letter-spacing:1px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <span>PATTERN</span><span>PTS</span><span>PCT</span><span>VERDICT</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:8px;font-size:12px;align-items:center;">
+            <span style="color:var(--text-primary)">Devotion only, no Sunday</span>
+            <span style="color:var(--free-rehab);font-family:'Orbitron',monospace;font-weight:700">86</span>
+            <span style="color:var(--free-rehab);font-family:'Orbitron',monospace;font-weight:700">55.13%</span>
+            <span style="color:var(--free-rehab);font-size:11px;">⚡ Free Rehab</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:8px;font-size:12px;align-items:center;">
+            <span style="color:var(--text-primary)">Devotion + Sunday only</span>
+            <span style="color:var(--neon-blue);font-family:'Orbitron',monospace;font-weight:700">104</span>
+            <span style="color:var(--neon-blue);font-family:'Orbitron',monospace;font-weight:700">66.67%</span>
+            <span style="color:var(--free-rehab);font-size:11px;">⚡ Free Rehab</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:8px;font-size:12px;align-items:center;">
+            <span style="color:var(--text-primary)">All sessions, no Sunday</span>
+            <span style="color:var(--qualified);font-family:'Orbitron',monospace;font-weight:700">138</span>
+            <span style="color:var(--qualified);font-family:'Orbitron',monospace;font-weight:700">88.46%</span>
+            <span style="color:var(--qualified);font-size:11px;">✦ Qualified</span>
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1.4fr;gap:8px;font-size:12px;align-items:center;padding-top:8px;border-top:1px solid rgba(0,180,255,0.1)">
+            <span style="color:var(--neon-purple);font-weight:600">All sessions + Sunday ✨</span>
+            <span style="color:var(--neon-purple);font-family:'Orbitron',monospace;font-weight:700">156</span>
+            <span style="color:var(--neon-purple);font-family:'Orbitron',monospace;font-weight:700">100%</span>
+            <span style="color:var(--qualified);font-size:11px;">🏆 Perfect</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- PROGRESS BAR SECTION -->
   <div class="progress-section">
@@ -677,8 +960,9 @@
   </div>
 
   <footer>
-    <div style="margin-bottom:8px;color:rgba(0,180,255,0.4);font-family:'Orbitron',monospace;letter-spacing:3px;font-size:10px">◈ ATTENDANCE SYSTEM ◈</div>
+    <div style="margin-bottom:8px;color:rgba(0,180,255,0.4);font-family:'Orbitron',monospace;letter-spacing:3px;font-size:10px">◈ JABU ATTENDANCE SYSTEM ◈</div>
     Semester: Feb 28 – Jun 29, 2026 &nbsp;·&nbsp; Total Semester Points: 156 &nbsp;·&nbsp; All calculations are real-time
+    <div style="margin-top:14px;font-size:9px;color:rgba(180,220,255,0.2);letter-spacing:1.5px;">made by Mycha</div>
   </footer>
 
 </div>
@@ -829,6 +1113,12 @@
     if (e.key === 'ArrowUp') { e.preventDefault(); adjustPoints(1); }
     if (e.key === 'ArrowDown') { e.preventDefault(); adjustPoints(-1); }
   });
+
+  // hints toggle
+  function toggleHints() {
+    const panel = document.getElementById('hints-panel');
+    panel.classList.toggle('collapsed');
+  }
 
   // init
   updateUI(0);
