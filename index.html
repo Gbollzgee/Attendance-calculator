@@ -535,6 +535,22 @@
   .special-pts-num { font-family: 'Orbitron', monospace; font-size: 26px; font-weight: 900; color: var(--neon-purple); display: block; line-height: 1; }
   .special-pts-label { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; margin-top: 4px; display: block; }
 
+  /* --- SAVE TOAST --- */
+  #save-toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(10, 30, 60, 0.92); backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 180, 255, 0.35); border-radius: 100px;
+    padding: 9px 22px; font-size: 12px; font-family: 'Orbitron', monospace;
+    letter-spacing: 1.5px; color: var(--neon-cyan);
+    box-shadow: 0 0 24px rgba(0,180,255,0.15), 0 8px 32px rgba(0,0,0,0.4);
+    opacity: 0; pointer-events: none; z-index: 999;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    white-space: nowrap;
+  }
+  #save-toast.show {
+    opacity: 1; transform: translateX(-50%) translateY(0);
+  }
+
   /* mobile tweaks */
   @media (max-width: 480px) {
     .app-wrapper { padding: 12px 12px 48px; }
@@ -962,12 +978,18 @@
   <footer>
     <div style="margin-bottom:8px;color:rgba(0,180,255,0.4);font-family:'Orbitron',monospace;letter-spacing:3px;font-size:10px">◈ JABU ATTENDANCE SYSTEM ◈</div>
     Semester: Feb 28 – Jun 29, 2026 &nbsp;·&nbsp; Total Semester Points: 156 &nbsp;·&nbsp; All calculations are real-time
-    <div style="margin-top:14px;font-size:9px;color:rgba(180,220,255,0.2);letter-spacing:1.5px;">made by Mycha</div>
+    <div style="margin-top:10px;font-size:11px;color:rgba(180,220,255,0.25);letter-spacing:1px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:rgba(0,180,255,0.4);display:inline-block;"></span>
+        Progress auto-saved to this device
+      </span>
+    </div>
+    <div style="margin-top:8px;font-size:9px;color:rgba(180,220,255,0.2);letter-spacing:1.5px;">made by Mycha</div>
   </footer>
 
 </div>
 
-<script>
+<div id="save-toast">✦ Progress saved</div>
   const TOTAL = 156;
   const QUALIFY_THRESHOLD = 0.70;
   const FREE_THRESHOLD = 0.20;
@@ -1051,44 +1073,14 @@
     if (document.activeElement !== inp) inp.value = pts;
   }
 
-  function adjustPoints(delta) {
-    usingChecklist = false;
-    currentPoints = Math.max(0, Math.min(156, currentPoints + delta));
-    document.getElementById('points-input').value = currentPoints;
-    updateUI(currentPoints);
-    syncChecklistToPoints(currentPoints);
-  }
-
-  function onManualInput(val) {
-    usingChecklist = false;
-    let v = parseInt(val, 10);
-    if (isNaN(v)) v = 0;
-    currentPoints = Math.max(0, Math.min(156, v));
-    updateUI(currentPoints);
-    syncChecklistToPoints(currentPoints);
-  }
-
   function toggleDay(el) {
     if (el.classList.contains('zero-pts')) return;
     el.classList.toggle('checked');
     recalcChecklist();
   }
 
-  function recalcChecklist() {
-    usingChecklist = true;
-    checklistPoints = 0;
-    document.querySelectorAll('.day-item.checked').forEach(el => {
-      checklistPoints += parseInt(el.dataset.pts, 10);
-    });
-    currentPoints = checklistPoints;
-    document.getElementById('points-input').value = currentPoints;
-    updateUI(currentPoints);
-  }
-
   function syncChecklistToPoints(pts) {
-    // uncheck all then check days greedily (highest pts first)
     const days = [...document.querySelectorAll('.day-item:not(.zero-pts)')];
-    // sort by pts desc
     const sorted = [...days].sort((a, b) => parseInt(b.dataset.pts) - parseInt(a.dataset.pts));
     let remaining = pts;
     days.forEach(d => d.classList.remove('checked'));
@@ -1099,16 +1091,6 @@
     }
   }
 
-  function resetAll() {
-    currentPoints = 0;
-    checklistPoints = 0;
-    usingChecklist = false;
-    document.getElementById('points-input').value = 0;
-    document.querySelectorAll('.day-item.checked').forEach(el => el.classList.remove('checked'));
-    updateUI(0);
-  }
-
-  // prevent going out of range on keyboard
   document.getElementById('points-input').addEventListener('keydown', function(e) {
     if (e.key === 'ArrowUp') { e.preventDefault(); adjustPoints(1); }
     if (e.key === 'ArrowDown') { e.preventDefault(); adjustPoints(-1); }
@@ -1120,8 +1102,90 @@
     panel.classList.toggle('collapsed');
   }
 
-  // init
-  updateUI(0);
+  // --- LOCALSTORAGE PERSISTENCE ---
+  const SAVE_KEY = 'jabu_attendance_pts';
+
+  function saveToStorage(pts) {
+    try { localStorage.setItem(SAVE_KEY, pts); } catch(e) {}
+  }
+
+  function loadFromStorage() {
+    try {
+      const saved = localStorage.getItem(SAVE_KEY);
+      if (saved !== null) {
+        const pts = parseInt(saved, 10);
+        if (!isNaN(pts) && pts >= 0 && pts <= 156) return pts;
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  // Patch all update paths to also save
+  const _origAdjust = adjustPoints;
+  function adjustPoints(delta) {
+    usingChecklist = false;
+    currentPoints = Math.max(0, Math.min(156, currentPoints + delta));
+    document.getElementById('points-input').value = currentPoints;
+    updateUI(currentPoints);
+    syncChecklistToPoints(currentPoints);
+    saveToStorage(currentPoints);
+  }
+
+  const _origManual = onManualInput;
+  function onManualInput(val) {
+    usingChecklist = false;
+    let v = parseInt(val, 10);
+    if (isNaN(v)) v = 0;
+    currentPoints = Math.max(0, Math.min(156, v));
+    updateUI(currentPoints);
+    syncChecklistToPoints(currentPoints);
+    saveToStorage(currentPoints);
+  }
+
+  const _origChecklist = recalcChecklist;
+  function recalcChecklist() {
+    usingChecklist = true;
+    checklistPoints = 0;
+    document.querySelectorAll('.day-item.checked').forEach(el => {
+      checklistPoints += parseInt(el.dataset.pts, 10);
+    });
+    currentPoints = checklistPoints;
+    document.getElementById('points-input').value = currentPoints;
+    updateUI(currentPoints);
+    saveToStorage(currentPoints);
+  }
+
+  const _origReset = resetAll;
+  function resetAll() {
+    currentPoints = 0;
+    checklistPoints = 0;
+    usingChecklist = false;
+    document.getElementById('points-input').value = 0;
+    document.querySelectorAll('.day-item.checked').forEach(el => el.classList.remove('checked'));
+    updateUI(0);
+    try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+    showSaveToast('Progress cleared');
+  }
+
+  function showSaveToast(msg) {
+    const t = document.getElementById('save-toast');
+    t.textContent = msg || '✦ Progress saved';
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // init — restore saved points or start fresh
+  const saved = loadFromStorage();
+  if (saved !== null) {
+    currentPoints = saved;
+    document.getElementById('points-input').value = saved;
+    syncChecklistToPoints(saved);
+    updateUI(saved);
+    showSaveToast('✦ Progress restored');
+  } else {
+    updateUI(0);
+  }
 </script>
 </body>
 </html>
